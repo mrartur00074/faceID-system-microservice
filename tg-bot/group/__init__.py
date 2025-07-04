@@ -1,0 +1,1 @@
+from group.image import image_router

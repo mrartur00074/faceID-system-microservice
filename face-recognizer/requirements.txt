@@ -1,0 +1,11 @@
+fastapi==0.110.1
+uvicorn[standard]==0.29.0
+pillow==10.3.0
+opencv-python-headless==4.9.0.80
+insightface==0.7.3
+numpy==1.23.5
+scipy==1.13.0
+onnxruntime==1.17.1
+pydantic==2.7.1
+kafka-python==2.0.2
+aiokafka==0.8.0
