@@ -31,6 +31,14 @@ services:
       - "8003:8003"
     networks:
       - app-network
+    env_file:
+      - .env
+    environment:
+      - TOKEN=${TG_TOKEN}
+      - USERNAME=${TG_USERNAME}
+      - PASSWORD=${TG_PASSWORD}
+      - ADMIN_KEY=${TG_ADMIN_KEY}
+      - API_ADDRESS=${BACKEND_API_ADDRESS}
 
   backend:
     build:
@@ -41,14 +49,13 @@ services:
     depends_on:
       - db
       - kafka
+    env_file:
+      - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/Django
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: admin
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_PROFILES_ACTIVE: docker
     networks:
       - app-network
+
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0

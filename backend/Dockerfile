@@ -1,16 +1,23 @@
 FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
 
+COPY gradlew .
+COPY gradle ./gradle
 COPY build.gradle settings.gradle ./
-RUN gradle build -x test || true  # Первый прогрев зависимостей (можно пропустить)
+RUN ./gradlew build -x test --no-daemon || true
 
 COPY . .
-RUN ./gradlew build -x test
+RUN ./gradlew build -x test --no-daemon
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app/build/libs/*.jar app.jar
 
+COPY wait-for-db.sh .
+RUN chmod +x wait-for-db.sh
+
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["./wait-for-db.sh"]
