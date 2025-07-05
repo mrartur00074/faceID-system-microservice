@@ -30,8 +30,8 @@ jobs:
             for dir in $changed_dirs; do
               if [ -f "$dir/Dockerfile" ]; then
                 echo "🔁 Rebuilding $dir"
-                docker compose build $dir
-                docker compose up -d $dir
+                docker-compose build $dir
+                docker-compose up -d $dir
               fi
             done
           EOF
