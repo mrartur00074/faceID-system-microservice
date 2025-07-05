@@ -1,3 +1,5 @@
+ARG VERSION=1.0.0
+LABEL version=$VERSION
 FROM python:3.10-slim
 
 ENV DEBIAN_FRONTEND=noninteractive

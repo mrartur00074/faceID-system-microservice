@@ -1,3 +1,5 @@
+ARG VERSION=1.0.0
+LABEL version=$VERSION
 FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
 
