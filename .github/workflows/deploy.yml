@@ -1,0 +1,38 @@
+name: Deploy to VDS
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy only changed microservices
+        run: |
+          ssh -o StrictHostKeyChecking=no user@your.vds.ip << 'EOF'
+            cd /path/to/your/project
+            git pull origin production
+
+            changed_dirs=$(git diff --name-only HEAD~1 HEAD | cut -d/ -f1 | sort -u)
+
+            echo "🔍 Changed directories: $changed_dirs"
+
+            for dir in $changed_dirs; do
+              if [ -f "$dir/Dockerfile" ]; then
+                echo "🔁 Rebuilding $dir"
+                docker compose build $dir
+                docker compose up -d $dir
+              fi
+            done
+          EOF
