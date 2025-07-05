@@ -96,6 +96,21 @@ services:
     networks:
       - app-network
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    env_file:
+      - .env
+    environment:
+      - VITE_BASE_URL=${VITE_BASE_URL}
+
 volumes:
   pgdata:
 

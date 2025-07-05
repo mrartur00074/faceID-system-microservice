@@ -3,7 +3,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const API_ENDPOINTS = {
     LOGIN: `${BASE_URL}/admins/login/`,
     LOGOUT: `${BASE_URL}/admins/logout/`,
-    GET_STUDENTS: `${BASE_URL}/applicant/applicants/`,
+    GET_STUDENTS: `${BASE_URL}/applicants`,
     GET_APPLICANT: `${BASE_URL}/applicant/applicants`,
     ADD_APPLICANT: `${BASE_URL}/applicant/applicants/upload/`,
     DELETE_APPLICANT: `${BASE_URL}/applicant/applicants`,
