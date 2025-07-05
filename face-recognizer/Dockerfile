@@ -24,6 +24,8 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN pip uninstall -y onnxruntime-gpu onnxruntime && pip install onnxruntime
+
 COPY wait-for-kafka.sh /wait-for-kafka.sh
 RUN chmod +x /wait-for-kafka.sh
 
