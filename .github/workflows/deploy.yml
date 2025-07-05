@@ -20,12 +20,11 @@ jobs:
 
       - name: Deploy only changed microservices
         run: |
-          ssh -o StrictHostKeyChecking=no user@your.vds.ip << 'EOF'
-            cd /path/to/your/project
+          ssh -o StrictHostKeyChecking=no deploy@5.129.201.115 << 'EOF'
+            cd /home/deploy/faceID-system-microservice
             git pull origin production
 
             changed_dirs=$(git diff --name-only HEAD~1 HEAD | cut -d/ -f1 | sort -u)
-
             echo "🔍 Changed directories: $changed_dirs"
 
             for dir in $changed_dirs; do
