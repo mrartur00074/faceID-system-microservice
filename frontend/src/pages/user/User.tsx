@@ -5,13 +5,15 @@ import { useAuth } from "../../context/AuthContext";
 import { API_ENDPOINTS } from "../../api/endpoints";
 import "./user.scss";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 // Тип для данных студента
 interface UserData {
   id: number;
-  applicant_id: number;
+  applicantId: number;
   name: string | null;
   surname: string | null;
-  phone_num: string | null;
+  phoneNum: string | null;
   school: string | null;
   attempt: number;
   status: string | null;
@@ -23,7 +25,7 @@ const User = () => {
   const { id } = useParams<{ id: string }>();
   const userId = Number(id);
   const navigate = useNavigate();
-  const { user, logout } = useAuth();  // Получаем user и logout из контекста
+  const { user, logout } = useAuth();
   const token = user?.token
 
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -31,14 +33,14 @@ const User = () => {
   const [formData, setFormData] = useState<UserData | null>(null);
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login"); // Если нет токена, перенаправляем на логин
-      return;
-    }
+    // if (!user) {
+    //   navigate("/login"); // Если нет токена, перенаправляем на логин
+    //   return;
+    // }
 
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`${API_ENDPOINTS.GET_APPLICANT}/${userId}/`, {
+        const response = await axios.get(`${API_ENDPOINTS.GET_APPLICANT}/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -75,7 +77,7 @@ const User = () => {
   const handleSave = async () => {
     if (formData) {
       try {
-        await axios.put(`${API_ENDPOINTS.GET_APPLICANT}/${userId}/`, formData, {
+        await axios.put(`${API_ENDPOINTS.GET_APPLICANT}/${userId}`, formData, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -107,14 +109,15 @@ const User = () => {
         <h1>User Details</h1>
         <div className="userInfo">
           <img
-              src={`data:image/jpeg;base64,${userData.base64}`} // Преобразуем base64 в изображение
+              src={BACKEND_URL + userData.base64}
               alt={`${userData.name || "No Name"} ${userData.surname || "No Surname"}`}
               className="userAvatar"
           />
           <div className="userDetails">
+            <p><strong>Applicant ID:</strong> {isEditing ? <input type="text" name="applicantId" value={formData?.applicantId || ''} onChange={handleChange} /> : userData.applicantId}</p>
             <p><strong>Name:</strong> {isEditing ? <input type="text" name="name" value={formData?.name || ''} onChange={handleChange} /> : userData.name}</p>
             <p><strong>Surname:</strong> {isEditing ? <input type="text" name="surname" value={formData?.surname || ''} onChange={handleChange} /> : userData.surname}</p>
-            <p><strong>Phone Number:</strong> {isEditing ? <input type="text" name="phone_num" value={formData?.phone_num || ''} onChange={handleChange} /> : userData.phone_num}</p>
+            <p><strong>Phone Number:</strong> {isEditing ? <input type="text" name="phoneNum" value={formData?.phoneNum || ''} onChange={handleChange} /> : userData.phoneNum}</p>
             <p><strong>School:</strong> {isEditing ? <input type="text" name="school" value={formData?.school || ''} onChange={handleChange} /> : userData.school}</p>
             <p><strong>Attempt:</strong> {isEditing ? <input type="number" name="attempt" value={formData?.attempt || 0} onChange={handleChange} /> : userData.attempt}</p>
             <p><strong>Status:</strong> {isEditing ? <input type="text" name="status" value={formData?.status || ''} onChange={handleChange} /> : userData.status}</p>

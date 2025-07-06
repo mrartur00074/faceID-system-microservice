@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import { API_ENDPOINTS } from "../../api/endpoints";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Check = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -46,7 +48,7 @@ const Check = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.font = "bold 32px Arial";
             ctx.fillStyle = "lime";
-            ctx.fillText(currentUser?.applicant_id || "Неизвестный ID", 20, 40);
+            ctx.fillText(currentUser?.applicantId || "Неизвестный ID", 20, 40);
 
             animationFrameId = requestAnimationFrame(draw);
         };
@@ -59,9 +61,9 @@ const Check = () => {
     const sendSearchRequest = async (base64Image?: string) => {
         const payload: any = {};
         if (query.trim()) {
-            payload.query = query.trim();
+            payload.applicantId = query.trim();
         } else if (base64Image) {
-            payload.image = base64Image;
+            payload.base64Image = base64Image;
         } else {
             return;
         }
@@ -77,13 +79,13 @@ const Check = () => {
 
             if (!isRecognizingRef.current && !query) return;
 
-            if (Array.isArray(data) && data.length > 0) {
-                setResults(data);
-                setCurrentUser(data[0]);
+            if (Array.isArray(data?.applicants) && data?.applicants.length > 0) {
+                setResults(data?.applicants);
+                setCurrentUser(data?.applicants[0]);
                 stopRecognition();
-            } else if (data?.applicant_id) {
-                setResults([data]);
-                setCurrentUser(data);
+            } else if (data?.applicants?.applicantId) {
+                setResults([data?.applicants]);
+                setCurrentUser(data?.applicants);
                 stopRecognition();
             } else {
                 setResults([]);
@@ -108,7 +110,11 @@ const Check = () => {
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode },
+            video: { 
+                facingMode,
+                width: { ideal: 640 },  // Ограничиваем максимальное разрешение
+                height: { ideal: 480 }
+                },
             });
 
             if (videoRef.current) {
@@ -122,17 +128,17 @@ const Check = () => {
                 if (video.videoWidth === 0 || video.videoHeight === 0) return;
 
                 const canvas = document.createElement("canvas");
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
+                canvas.width = video.videoWidth / 2;
+                canvas.height = video.videoHeight / 2;
 
                 const ctx = canvas.getContext("2d");
                 if (!ctx) return;
 
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const base64Image = canvas.toDataURL("image/jpeg").split(",")[1];
+                const base64Image = canvas.toDataURL("image/jpeg", 0.8).split(",")[1];
 
                 await sendSearchRequest(base64Image);
-            }, 1200);
+            }, 1500);
 
             setIntervalId(id);
         } catch (err) {
@@ -176,125 +182,127 @@ const Check = () => {
     };
 
     return (
-        <Box p={2}>
-            <Typography variant="h4" mb={2}>
-                Распознавание студентов
-            </Typography>
+        <div className="check">
+            <Box p={2}>
+                <Typography variant="h4" mb={2}>
+                    Распознавание студентов
+                </Typography>
 
-            <Box display="flex" alignItems="center" gap={2} mb={2} flexWrap="wrap">
-                <TextField
-                    label="Поиск по имени или ID"
-                    value={query}
-                    onChange={handleInputChange}
-                    disabled={inputDisabled}
-                />
-                <Button
-                    variant="contained"
-                    onClick={handleSearchClick}
-                    disabled={isRecognizing || !query}
-                >
-                    Искать
-                </Button>
-
-                {!isRecognizing ? (
+                <Box display="flex" alignItems="center" gap={2} mb={2} flexWrap="wrap">
+                    <TextField
+                        label="Поиск по имени или ID"
+                        value={query}
+                        onChange={handleInputChange}
+                        disabled={inputDisabled}
+                    />
                     <Button
                         variant="contained"
-                        color="success"
-                        onClick={startRecognition}
-                        disabled={!!query}
+                        onClick={handleSearchClick}
+                        disabled={isRecognizing || !query}
                     >
-                        Начать распознавание
+                        Искать
                     </Button>
-                ) : (
-                    <Button variant="contained" color="error" onClick={stopRecognition}>
-                        Остановить
+
+                    {!isRecognizing ? (
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={startRecognition}
+                            disabled={!!query}
+                        >
+                            Начать распознавание
+                        </Button>
+                    ) : (
+                        <Button variant="contained" color="error" onClick={stopRecognition}>
+                            Остановить
+                        </Button>
+                    )}
+
+                    <Button variant="outlined" onClick={toggleCamera}>
+                        Сменить камеру ({facingMode === "user" ? "Фронтальная" : "Задняя"})
                     </Button>
+                </Box>
+
+                {errorMessage && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {errorMessage}
+                    </Alert>
                 )}
 
-                <Button variant="outlined" onClick={toggleCamera}>
-                    Сменить камеру ({facingMode === "user" ? "Фронтальная" : "Задняя"})
-                </Button>
-            </Box>
+                {currentUser && (
+                    <Card sx={{ maxWidth: 400, mb: 3 }}>
+                        <CardMedia
+                            component="img"
+                            height="400"
+                            image={BACKEND_URL + currentUser.base64}
+                            alt="Распознанный студент"
+                        />
+                        <CardContent>
+                            <Typography variant="h6">
+                                {currentUser.name} {currentUser.surname}
+                            </Typography>
+                            <Typography>ID: {currentUser.applicantId}</Typography>
+                            {currentUser.school && (
+                                <Typography>Школа: {currentUser.school}</Typography>
+                            )}
+                            {currentUser.status && (
+                                <Typography>Статус: {currentUser.status}</Typography>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
 
-            {errorMessage && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                    {errorMessage}
-                </Alert>
-            )}
-
-            {currentUser && (
-                <Card sx={{ maxWidth: 400, mb: 3 }}>
-                    <CardMedia
-                        component="img"
-                        height="400"
-                        image={`data:image/jpeg;base64,${currentUser.base64}`}
-                        alt="Распознанный студент"
+                <Box position="relative" width="640px" height="480px" mb={4}>
+                    <video
+                        ref={videoRef}
+                        autoPlay
+                        muted
+                        playsInline
+                        width="640"
+                        height="480"
+                        style={{ borderRadius: 8 }}
                     />
-                    <CardContent>
-                        <Typography variant="h6">
-                            {currentUser.name} {currentUser.surname}
-                        </Typography>
-                        <Typography>ID: {currentUser.applicant_id}</Typography>
-                        {currentUser.school && (
-                            <Typography>Школа: {currentUser.school}</Typography>
-                        )}
-                        {currentUser.status && (
-                            <Typography>Статус: {currentUser.status}</Typography>
-                        )}
-                    </CardContent>
-                </Card>
-            )}
-
-            <Box position="relative" width="640px" height="480px" mb={4}>
-                <video
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    playsInline
-                    width="640"
-                    height="480"
-                    style={{ borderRadius: 8 }}
-                />
-                <canvas
-                    ref={canvasRef}
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        zIndex: 10,
-                        width: "100%",
-                        height: "100%",
-                        pointerEvents: "none",
-                    }}
-                />
-            </Box>
-
-            {results.length > 1 && (
-                <Box mt={2}>
-                    <Typography variant="h6">Другие совпадения:</Typography>
-                    <Grid container spacing={2} mt={1}>
-                        {results.slice(1).map((item) => (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={item.applicant_id}>
-                                <Card>
-                                    <CardMedia
-                                        component="img"
-                                        height="200"
-                                        image={`data:image/jpeg;base64,${item.base64}`}
-                                        alt="Student"
-                                    />
-                                    <CardContent>
-                                        <Typography variant="h6">
-                                            {item.name} {item.surname}
-                                        </Typography>
-                                        <Typography>ID: {item.applicant_id}</Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
+                    <canvas
+                        ref={canvasRef}
+                        style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            zIndex: 10,
+                            width: "100%",
+                            height: "100%",
+                            pointerEvents: "none",
+                        }}
+                    />
                 </Box>
-            )}
-        </Box>
+
+                {results.length > 1 && (
+                    <Box mt={2}>
+                        <Typography variant="h6">Другие совпадения:</Typography>
+                        <Grid container spacing={2} mt={1}>
+                            {results.slice(1).map((item) => (
+                                <Grid item xs={12} sm={6} md={4} lg={3} key={item.applicantId}>
+                                    <Card>
+                                        <CardMedia
+                                            component="img"
+                                            height="200"
+                                            image={BACKEND_URL + currentUser.base64}
+                                            alt="Student"
+                                        />
+                                        <CardContent>
+                                            <Typography variant="h6">
+                                                {item.name} {item.surname}
+                                            </Typography>
+                                            <Typography>ID: {item.applicantId}</Typography>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Box>
+                )}
+            </Box>
+        </div>
     );
 };
 

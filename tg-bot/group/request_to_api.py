@@ -4,10 +4,13 @@ from config import Api_address
 def send_file(base64_data, applicant_id):
     data = {
         "base64": base64_data,
-        "applicant_id": applicant_id
+        "applicantId": applicant_id
     }
 
     url = Api_address + "/applicants/add"
+
+    print("Отправка на:" + url)
+
     try:
         response = requests.post(url, json=data)
     except requests.RequestException as e:

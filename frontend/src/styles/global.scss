@@ -16,6 +16,11 @@ a {
   font-family: "Inter", sans-serif;
   background-color: $main-bg;
   color: $main-color;
+  min-height: 100vh;
+}
+
+.check {
+  background-color: white;
 }
 
 .container {

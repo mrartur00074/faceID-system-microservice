@@ -1,21 +1,22 @@
-import BarChartBox from "../../components/barChartBox/BarChartBox";
-import BigChartBox from "../../components/bigChartBox/BigChartBox";
-import ChartBox from "../../components/chartBox/ChartBox";
-import PieChartBox from "../../components/pieCartBox/PieChartBox";
-import TopBox from "../../components/topBox/TopBox";
-import {
-  barChartBoxRevenue,
-  barChartBoxVisit,
-  chartBoxConversion,
-  chartBoxProduct,
-  chartBoxRevenue,
-  chartBoxUser,
-} from "../../data";
+// import BarChartBox from "../../components/barChartBox/BarChartBox";
+// import BigChartBox from "../../components/bigChartBox/BigChartBox";
+// import ChartBox from "../../components/chartBox/ChartBox";
+// import PieChartBox from "../../components/pieCartBox/PieChartBox";
+// import TopBox from "../../components/topBox/TopBox";
+// import {
+//   barChartBoxRevenue,
+//   barChartBoxVisit,
+//   chartBoxConversion,
+//   chartBoxProduct,
+//   chartBoxRevenue,
+//   chartBoxUser,
+// } from "../../data";
 import "./home.scss";
 
 const Home = () => {
   return (
-    <div className="home">
+    <div className="check">
+      {/*
       <div className="box box1">
         <TopBox />
       </div>
@@ -42,7 +43,7 @@ const Home = () => {
       </div>
       <div className="box box9">
         <BarChartBox {...barChartBoxRevenue} />
-      </div>
+      </div>*/}
     </div>
   );
 };

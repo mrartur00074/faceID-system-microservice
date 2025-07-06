@@ -6,42 +6,29 @@ import axios from "axios";
 import { API_ENDPOINTS } from "../../api/endpoints";
 import { useNavigate } from "react-router-dom";
 
-const getImageMimeType = (base64: string): string => {
-  if (base64.startsWith("/9j/")) return "jpeg";       // JPEG
-  if (base64.startsWith("iVBOR")) return "png";        // PNG
-  if (base64.startsWith("UklGR")) return "webp";       // WEBP
-  return "jpeg"; // fallback
-};
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const columns: GridColDef[] = [
   {
-    field: "applicant_id",
+    field: "applicantId",
     headerName: "ID",
     width: 90,
     type: 'number',
-    valueGetter: (params) => params.row.applicant_id?.toString(),
+    valueGetter: (params) => params.row.applicantId?.toString(),
   },
   {
     field: "base64",
     headerName: "Фото",
     width: 100,
     renderCell: (params) => {
-      if (!params.value) return "Нет фото";
-      const mimeType = getImageMimeType(params.value);
-      const imageSrc = `data:image/${mimeType};base64,${params.value}`;
       return (
           <img
-              src={imageSrc}
+              src={BACKEND_URL + params.value}
               alt="Фото"
               style={{ width: 40, height: 40, objectFit: "cover", borderRadius: "50%" }}
           />
       );
     },
-  },
-  {
-    field: "error",
-    headerName: "Ошибка",
-    width: 500,
   },
   {
     field: "attempt",
@@ -91,8 +78,8 @@ const ErrorStudents = () => {
         }
         throw err;
       }
-    },
-    enabled: !!token,
+    }
+    // enabled: !!token,
   });
 
   return (
@@ -106,7 +93,7 @@ const ErrorStudents = () => {
         ) : error ? (
             <div>Error fetching data</div>
         ) : (
-            <DataTable slug="blacklist" columns={columns} rows={data} errors={false} blacklist={true}/>
+            <DataTable slug="blacklist" columns={columns} rows={data.content} errors={false} blacklist={true}/>
         )}
       </div>
   );

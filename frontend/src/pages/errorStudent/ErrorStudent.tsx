@@ -6,16 +6,18 @@ import { API_ENDPOINTS } from "../../api/endpoints";
 
 interface UserData {
   id: number;
-  applicant_id: number;
+  applicantId: number;
   name: string | null;
   surname: string | null;
-  phone_num: string | null;
+  phoneNum: string | null;
   school: string | null;
   attempt: number;
   status: string | null;
   base64: string;
   created_at: string;
 }
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ErrorStudent = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,14 +32,14 @@ const ErrorStudent = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    /*if (!user) {
       navigate("/login");
       return;
-    }
+    }*/
 
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`${API_ENDPOINTS.GET_ERROR_STUDENT}/${userId}/`, {
+        const response = await axios.get(`${API_ENDPOINTS.GET_ERROR_STUDENT}/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -71,13 +73,13 @@ const ErrorStudent = () => {
   };
 
   const handleSave = async () => {
-    if (!formData || !formData.applicant_id) {
+    if (!formData || !formData.applicantId) {
       setErrorMessage("Поле applicant_id обязательно");
       return;
     }
 
     try {
-      await axios.post(`${API_ENDPOINTS.FIX_ERROR_STUDENT}/${userId}/fix/`, formData, {
+      await axios.post(`${API_ENDPOINTS.FIX_ERROR_STUDENT}/${userId}/fix`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -109,26 +111,26 @@ const ErrorStudent = () => {
         <h1>User Details</h1>
         <div className="userInfo">
           <img
-              src={`data:image/jpeg;base64,${userData.base64}`}
+              src={BACKEND_URL + userData.base64}
               alt={`${userData.name || "No Name"} ${userData.surname || "No Surname"}`}
               className="userAvatar"
           />
           <div className="userDetails">
             <p>
-              <strong>Applicant ID:</strong>{" "}
+              <strong>ID Абитуриента:</strong>{" "}
               {isEditing ? (
                   <input
                       type="number"
-                      name="applicant_id"
-                      value={formData?.applicant_id || ""}
+                      name="applicantId"
+                      value={formData?.applicantId || ""}
                       onChange={handleChange}
                   />
               ) : (
-                  userData.applicant_id
+                  userData.applicantId
               )}
             </p>
             <p>
-              <strong>Name:</strong>{" "}
+              <strong>Имя:</strong>{" "}
               {isEditing ? (
                   <input type="text" name="name" value={formData?.name || ""} onChange={handleChange} />
               ) : (
@@ -136,7 +138,7 @@ const ErrorStudent = () => {
               )}
             </p>
             <p>
-              <strong>Surname:</strong>{" "}
+              <strong>Фамилия:</strong>{" "}
               {isEditing ? (
                   <input
                       type="text"
@@ -149,20 +151,20 @@ const ErrorStudent = () => {
               )}
             </p>
             <p>
-              <strong>Phone Number:</strong>{" "}
+              <strong>Номер телефона:</strong>{" "}
               {isEditing ? (
                   <input
                       type="text"
-                      name="phone_num"
-                      value={formData?.phone_num || ""}
+                      name="phoneNum"
+                      value={formData?.phoneNum || ""}
                       onChange={handleChange}
                   />
               ) : (
-                  userData.phone_num
+                  userData.phoneNum
               )}
             </p>
             <p>
-              <strong>School:</strong>{" "}
+              <strong>Школа:</strong>{" "}
               {isEditing ? (
                   <input
                       type="text"
@@ -175,7 +177,7 @@ const ErrorStudent = () => {
               )}
             </p>
             <p>
-              <strong>Attempt:</strong>{" "}
+              <strong>Количество попыток:</strong>{" "}
               {isEditing ? (
                   <input
                       type="number"
@@ -188,7 +190,7 @@ const ErrorStudent = () => {
               )}
             </p>
             <p>
-              <strong>Status:</strong>{" "}
+              <strong>Статус:</strong>{" "}
               {isEditing ? (
                   <input
                       type="text"
@@ -209,11 +211,11 @@ const ErrorStudent = () => {
         <div className="userActions">
           {isEditing ? (
               <>
-                <button onClick={handleSave}>Save Changes</button>
-                <button onClick={() => setIsEditing(false)}>Cancel</button>
+                <button onClick={handleSave}>Сохранить</button>
+                <button onClick={() => setIsEditing(false)}>Отмена</button>
               </>
           ) : (
-              <button onClick={() => setIsEditing(true)}>Edit</button>
+              <button onClick={() => setIsEditing(true)}>Изменить и сохранить как абитуриента</button>
           )}
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
         </div>

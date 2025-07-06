@@ -21,6 +21,8 @@ public class BlackList {
     private String surname;
     private String phoneNum;
     private String school;
+    private Integer attempt;
+    private String status;
     private String base64;
 
     @Column(columnDefinition = "TEXT")

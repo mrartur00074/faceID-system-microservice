@@ -20,12 +20,12 @@ const DataTable = (props: Props) => {
     const navigate = useNavigate();
     const [rows, setRows] = useState(props.rows);
 
-    const handleBlacklist = async (id: number, applicant_id: number) => {
+    const handleBlacklist = async (id: number, applicantId: number) => {
         try {
-            const targetId = props.errors ? id : applicant_id;
+            const targetId = props.errors ? id : applicantId;
 
             const response = await axios.post(
-                `${API_ENDPOINTS.BLACKLIST_APPLICANT}/${targetId}/blacklist/`,
+                `${API_ENDPOINTS.BLACKLIST_APPLICANT}/${targetId}/to-blacklist`,
                 {},
                 {
                     headers: {
@@ -49,17 +49,17 @@ const DataTable = (props: Props) => {
         }
     };
 
-    const handleDelete = async (id: number, applicant_id: String) => {
+    const handleDelete = async (id: number, applicantId: String) => {
         try {
-            const targetId = props.errors ? id : applicant_id;
+            const targetId = props.errors ? id : applicantId;
             let endpoint = "";
 
             if (props.errors) {
-                endpoint = `${API_ENDPOINTS.DELETE_ERROR_STUDENT}/${targetId}/`;
+                endpoint = `${API_ENDPOINTS.DELETE_ERROR_STUDENT}/${targetId}`;
             } else if (props.blacklist) {
-                endpoint = `${API_ENDPOINTS.DELETE_BAN_STUDENT}/${targetId}/`;
+                endpoint = `${API_ENDPOINTS.DELETE_BAN_STUDENT}/${targetId}`;
             } else {
-                endpoint = `${API_ENDPOINTS.DELETE_APPLICANT}/${targetId}/`;
+                endpoint = `${API_ENDPOINTS.DELETE_APPLICANT}/${targetId}`;
             }
 
             const response = await fetch(endpoint, {
@@ -72,8 +72,8 @@ const DataTable = (props: Props) => {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    logout(); // Если токен невалиден, выходим из аккаунта
-                    navigate("/login"); // Перенаправляем на страницу логина
+                    logout();
+                    navigate("/login");
                 } else {
                     const errorText = await response.text();
                     throw new Error(errorText || "Ошибка при удалении.");
@@ -83,7 +83,7 @@ const DataTable = (props: Props) => {
             setRows((prevRows: any[]) => prevRows.filter((row) => row.id !== id));
 
             // Обработка успешного ответа
-            console.log(`Поступающий с ID ${applicant_id} успешно удалён.`);
+            console.log(`Поступающий с ID ${applicantId} успешно удалён.`);
 
         } catch (err: any) {
             console.error("Ошибка:", err.message);
@@ -95,7 +95,7 @@ const DataTable = (props: Props) => {
         headerName: "Action",
         width: 150,
         renderCell: (params) => {
-            const idForLink = props.errors ? params.row.id : params.row.applicant_id;
+            const idForLink = props.errors ? params.row.id : params.row.applicantId;
 
             return (
                 <div className="action">
@@ -104,14 +104,14 @@ const DataTable = (props: Props) => {
                     </Link>
                     <div
                         className="delete"
-                        onClick={() => handleDelete(params.row.id, params.row.applicant_id)}
+                        onClick={() => handleDelete(params.row.id, params.row.applicantId)}
                     >
                         <img src="/delete.svg" alt="Delete" />
                     </div>
                     {!props.blacklist && (
                         <div
                             className="blacklist"
-                            onClick={() => handleBlacklist(params.row.id, params.row.applicant_id)}
+                            onClick={() => handleBlacklist(params.row.id, params.row.applicantId)}
                         >
                             <img src="/ban.svg" alt="Blacklist" />
                         </div>

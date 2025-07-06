@@ -1,14 +1,11 @@
 package org.example.backend.DTO;
 
-import lombok.*;
-
+import lombok.Builder;
+import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class BlackListDTO {
+public class ErrorApplicantDTO {
     private Long id;
     private Integer applicantId;
     private String name;
@@ -18,5 +15,7 @@ public class BlackListDTO {
     private Integer attempt;
     private String status;
     private String base64;
+    private String error;
+    private LocalDateTime createdAt;
     private String embedding;
 }

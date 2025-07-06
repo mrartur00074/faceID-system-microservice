@@ -62,7 +62,12 @@ function App() {
     },
     {
       path: "/check",
-      element: <Check />,
+      element: (
+          <Layout />
+      ),
+      children: [
+        { path: "", element: <Check /> },
+      ]
     },
   ]);
 

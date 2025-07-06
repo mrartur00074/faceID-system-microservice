@@ -4,4 +4,5 @@ import org.example.backend.model.ErrorApplicant;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ErrorApplicantRepository extends JpaRepository<ErrorApplicant, Long> {
+    void deleteByApplicantId(Integer applicantId);
 }

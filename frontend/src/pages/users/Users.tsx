@@ -9,32 +9,24 @@ import axios from "axios";
 import { API_ENDPOINTS } from "../../api/endpoints";
 import { useNavigate } from "react-router-dom";
 
-const getImageMimeType = (base64: string): string => {
-  if (base64.startsWith("/9j/")) return "jpeg";       // JPEG
-  if (base64.startsWith("iVBOR")) return "png";        // PNG
-  if (base64.startsWith("UklGR")) return "webp";       // WEBP
-  return "jpeg"; // fallback
-};
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const columns: GridColDef[] = [
   {
-    field: "applicant_id",
+    field: "applicantId",
     headerName: "ID",
     width: 90,
     type: 'number',
-    valueGetter: (params) => params.row.applicant_id?.toString(),
+    valueGetter: (params) => params.row.applicantId?.toString(),
   },
   {
     field: "base64",
     headerName: "Фото",
     width: 100,
     renderCell: (params) => {
-      if (!params.value) return "Нет фото";
-      const mimeType = getImageMimeType(params.value);
-      const imageSrc = `data:image/${mimeType};base64,${params.value}`;
       return (
           <img
-              src={imageSrc}
+              src={BACKEND_URL + params.value}
               alt="Фото"
               style={{ width: 40, height: 40, objectFit: "cover", borderRadius: "50%" }}
           />
@@ -52,7 +44,7 @@ export const columns: GridColDef[] = [
     width: 150,
   },
   {
-    field: "phone_num",
+    field: "phoneNum",
     headerName: "Телефон",
     width: 150,
   },
@@ -73,11 +65,11 @@ export const columns: GridColDef[] = [
     width: 150,
   },
   {
-    field: "created_at",
+    field: "createdAt",
     headerName: "Создано",
     width: 180,
     valueGetter: (params) =>
-        new Date(params.value).toLocaleString("ru-RU", {
+        new Date(params?.value).toLocaleString("ru-RU", {
           year: "numeric",
           month: "short",
           day: "numeric",
@@ -110,8 +102,8 @@ const Users = () => {
         }
         throw err;
       }
-    },
-    enabled: !!token,
+    }
+    //enabled: !!token,
   });
 
   return (
@@ -126,7 +118,7 @@ const Users = () => {
         ) : error ? (
             <div>Error fetching data</div>
         ) : (
-            <DataTable slug="users" columns={columns} rows={data} errors={false} blacklist={false}/>
+            <DataTable slug="users" columns={columns} rows={data?.content} errors={false} blacklist={false}/>
         )}
 
         {open && <Add slug="user" columns={columns} setOpen={setOpen} />}

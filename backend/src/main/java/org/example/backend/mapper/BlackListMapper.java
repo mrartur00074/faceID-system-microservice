@@ -64,18 +64,4 @@ public class BlackListMapper {
 
         return blackList;
     }
-
-    public void updateEntity(BlackListDTO dto, BlackList entity) {
-        if (dto == null || entity == null) {
-            return;
-        }
-
-        entity.setApplicantId(dto.getApplicantId());
-        entity.setName(dto.getName());
-        entity.setSurname(dto.getSurname());
-        entity.setPhoneNum(dto.getPhoneNum());
-        entity.setSchool(dto.getSchool());
-        entity.setBase64(dto.getBase64());
-        entity.setEmbedding(dto.getEmbedding());
-    }
 }

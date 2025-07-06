@@ -1,5 +1,8 @@
 package org.example.backend.util;
 
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class EmbeddingUtils {
     private static final double SIMILARITY_THRESHOLD = 0.6;
 
@@ -26,7 +29,12 @@ public class EmbeddingUtils {
             normV2 += v2[i] * v2[i];
         }
 
-        System.out.println("Схожесть: " + dot / (Math.sqrt(normV1) * Math.sqrt(normV2)));
         return dot / (Math.sqrt(normV1) * Math.sqrt(normV2));
+    }
+
+    public static String convertEmbeddingToString(float[] embedding) {
+        return IntStream.range(0, embedding.length)
+                .mapToObj(i -> Float.toString(embedding[i]))
+                .collect(Collectors.joining(","));
     }
 }

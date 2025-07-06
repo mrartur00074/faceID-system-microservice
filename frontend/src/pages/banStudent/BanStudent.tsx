@@ -6,16 +6,18 @@ import { API_ENDPOINTS } from "../../api/endpoints";
 
 interface UserData {
   id: number;
-  applicant_id: number;
+  applicantId: number;
   name: string | null;
   surname: string | null;
-  phone_num: string | null;
+  phoneNum: string | null;
   school: string | null;
   attempt: number;
   status: string | null;
   base64: string;
   created_at: string;
 }
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const BannedStudent = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,14 +30,14 @@ const BannedStudent = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    /*if (!user) {
       navigate("/login");
       return;
-    }
+    }*/
 
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`${API_ENDPOINTS.GET_BAN_STUDENT}/${userId}/`, {
+        const response = await axios.get(`${API_ENDPOINTS.GET_BAN_STUDENT}/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUserData(response.data);
@@ -54,7 +56,7 @@ const BannedStudent = () => {
 
   const handleRestore = async () => {
     try {
-      await axios.post(`${API_ENDPOINTS.RESTORE_BLACKLIST}/${userData?.applicant_id}/restore/`, null, {
+      await axios.post(`${API_ENDPOINTS.RESTORE_BLACKLIST}/${userData?.applicantId}/restore`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/blacklist"); // Перенаправляем после восстановления
@@ -70,15 +72,15 @@ const BannedStudent = () => {
         <h1>Banned Student</h1>
         <div className="userInfo">
           <img
-              src={`data:image/jpeg;base64,${userData.base64}`}
+              src={BACKEND_URL + userData.base64}
               alt={`${userData.name || "No Name"} ${userData.surname || "No Surname"}`}
               className="userAvatar"
           />
           <div className="userDetails">
-            <p><strong>Applicant ID:</strong> {userData.applicant_id}</p>
+            <p><strong>Applicant ID:</strong> {userData.applicantId}</p>
             <p><strong>Name:</strong> {userData.name}</p>
             <p><strong>Surname:</strong> {userData.surname}</p>
-            <p><strong>Phone Number:</strong> {userData.phone_num}</p>
+            <p><strong>Phone Number:</strong> {userData.phoneNum}</p>
             <p><strong>School:</strong> {userData.school}</p>
             <p><strong>Attempt:</strong> {userData.attempt}</p>
             <p><strong>Status:</strong> {userData.status}</p>

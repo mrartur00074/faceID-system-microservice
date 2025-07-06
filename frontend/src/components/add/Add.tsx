@@ -36,14 +36,14 @@ const Add = (props: Props) => {
     e.preventDefault();
     setError(null);
 
-    if (!formData.applicant_id || !photoBase64) {
+    if (!formData.applicantId || !photoBase64) {
       setError("Поля ID и Фото обязательны.");
       return;
     }
 
     const payload = {
-      applicant_id: formData.applicant_id,
-      image: photoBase64,
+      applicantId: formData.applicantId,
+      base64: photoBase64,
     };
 
     try {
@@ -101,7 +101,7 @@ const Add = (props: Props) => {
                           <input
                               type={column.type === "number" ? "number" : "text"}
                               placeholder={column.field}
-                              required={column.field === "applicant_id"}
+                              required={column.field === "applicantId"}
                               onChange={(e) =>
                                   setFormData((prev: any) => ({
                                     ...prev,

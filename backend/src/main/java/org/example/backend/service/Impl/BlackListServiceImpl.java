@@ -1,4 +1,5 @@
 package org.example.backend.service.Impl;
+import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.example.backend.DTO.BlackListDTO;
 import org.example.backend.mapper.ApplicantMapper;
 import org.example.backend.model.Applicant;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
@@ -27,7 +29,7 @@ public class BlackListServiceImpl implements BlackListService {
     public BlackListDTO getByApplicantId(Integer applicantId) {
         return mapper.toDto(
                 repository.findByApplicantId(applicantId)
-                        .orElseThrow(() -> new NoSuchElementException("Blacklisted applicant not found"))
+                        .orElseThrow(() -> new NoSuchElementException("Абитуриент не обнаружен в черном списке"))
         );
     }
 
@@ -37,10 +39,11 @@ public class BlackListServiceImpl implements BlackListService {
                 .map(mapper::toDto);
     }
 
+    @Transactional
     @Override
     public BlackListDTO update(Integer applicantId, BlackListDTO dto) {
         BlackList entity = repository.findByApplicantId(applicantId)
-                .orElseThrow(() -> new NoSuchElementException("Blacklisted applicant not found"));
+                .orElseThrow(() -> new NoSuchElementException("Абитуриент не обнаружен в черном списке"));
 
         entity.setName(dto.getName());
         entity.setSurname(dto.getSurname());
@@ -51,18 +54,22 @@ public class BlackListServiceImpl implements BlackListService {
         return mapper.toDto(repository.save(entity));
     }
 
+    @Transactional
     @Override
     public void delete(Integer applicantId) {
+        if (!repository.existsByApplicantId(applicantId)) {
+            throw new ResourceNotFoundException("Поступающий с id = " + applicantId + " не найден");
+        }
         repository.deleteByApplicantId(applicantId);
     }
 
     @Override
     public void restoreToApplicants(Integer applicantId) {
         BlackList blacklist = repository.findByApplicantId(applicantId)
-                .orElseThrow(() -> new RuntimeException("Not found"));
+                .orElseThrow(() -> new RuntimeException("Не найден"));
 
         if (applicantRepository.findByApplicantId(applicantId).isPresent()) {
-            throw new RuntimeException("Already exists in applicants");
+            throw new RuntimeException("Уже есть в абитуриентах");
         }
 
         Applicant applicant = applicantMapper.fromBlacklist(blacklist);

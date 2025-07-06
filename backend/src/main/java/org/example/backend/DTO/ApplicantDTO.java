@@ -1,4 +1,5 @@
 package org.example.backend.DTO;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;

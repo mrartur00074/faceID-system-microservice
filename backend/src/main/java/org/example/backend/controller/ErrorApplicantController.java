@@ -1,11 +1,13 @@
 package org.example.backend.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.backend.DTO.ApplicantDTO;
+import org.example.backend.DTO.ErrorApplicantDTO;
 import org.example.backend.model.ErrorApplicant;
 import org.example.backend.repository.ErrorApplicantRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.example.backend.service.ErrorApplicantService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -14,11 +16,40 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ErrorApplicantController {
 
-    private final ErrorApplicantRepository repository;
+    private final ErrorApplicantRepository errorApplicantRepository;
+    private final ErrorApplicantService errorApplicantService;
 
     @GetMapping
-    public List<ErrorApplicant> getAllErrorApplicants() {
-        System.out.println("getAllErrorApplicants");
-        return repository.findAll();
+    public ResponseEntity<List<ErrorApplicantDTO>> getAllErrorApplicants() {
+        List<ErrorApplicantDTO> errorApplicants = errorApplicantService.getAll();
+        return ResponseEntity.ok(errorApplicants);
+    }
+
+    @GetMapping("/{applicantId}")
+    public ResponseEntity<ErrorApplicantDTO> getErrorApplicantById(@PathVariable Long applicantId) {
+        ErrorApplicantDTO errorApplicant = errorApplicantService.getById(applicantId);
+        return ResponseEntity.ok(errorApplicant);
+    }
+
+    @PutMapping("/{applicantId}")
+    public ResponseEntity<ErrorApplicantDTO> update(
+            @PathVariable Long applicantId,
+            @RequestBody ErrorApplicantDTO dto) {
+        ErrorApplicantDTO updatedDto = errorApplicantService.update(applicantId, dto);
+        return ResponseEntity.ok(updatedDto);
+    }
+
+    @DeleteMapping("/{applicantId}")
+    public ResponseEntity<Void> delete(@PathVariable Long applicantId) {
+        errorApplicantService.delete(applicantId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{applicantId}/fix")
+    public ResponseEntity<ApplicantDTO> fix(
+            @PathVariable Long applicantId,
+            @RequestBody ErrorApplicantDTO dto) {
+        ApplicantDTO applicantDTO = errorApplicantService.fix(dto, applicantId);
+        return ResponseEntity.ok(applicantDTO);
     }
 }

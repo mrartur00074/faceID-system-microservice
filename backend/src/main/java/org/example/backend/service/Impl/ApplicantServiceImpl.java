@@ -1,18 +1,15 @@
 package org.example.backend.service.Impl;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.example.backend.DTO.ApplicantDTO;
 import org.example.backend.mapper.ApplicantMapper;
 import org.example.backend.mapper.BlackListMapper;
-import org.example.backend.mapper.ErrorApplicantMapper;
 import org.example.backend.model.Applicant;
 import org.example.backend.model.BlackList;
-import org.example.backend.model.ErrorApplicant;
 import org.example.backend.repository.ApplicantRepository;
 import org.example.backend.repository.BlackListRepository;
-import org.example.backend.repository.ErrorApplicantRepository;
 import org.example.backend.service.ApplicantService;
-import org.example.backend.service.ErrorApplicantService;
 import org.example.backend.util.EmbeddingUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -22,14 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -45,13 +40,13 @@ public class ApplicantServiceImpl implements ApplicantService {
     private final ExternalRecognitionServiceImpl externalRecognitionService;
     private final ErrorApplicantServiceImpl errorApplicantService;
 
-    private static final String IMAGE_DIR = "images";
+    private static final String IMAGE_DIR = "/app/images";
 
     @Override
     public ApplicantDTO getByApplicantId(Integer applicantId) {
         return repository.findByApplicantId(applicantId)
                 .map(mapper::toDto)
-                .orElseThrow(() -> new RuntimeException("Applicant not found"));
+                .orElseThrow(() -> new RuntimeException("Поступающий не найден"));
     }
 
     @Override
@@ -63,20 +58,24 @@ public class ApplicantServiceImpl implements ApplicantService {
     @Transactional
     public ApplicantDTO update(Integer applicantId, ApplicantDTO dto) {
         Applicant applicant = repository.findByApplicantId(applicantId)
-                .orElseThrow(() -> new RuntimeException("Applicant not found"));
+                .orElseThrow(() -> new RuntimeException("Поступающий не найден"));
         mapper.updateEntity(dto, applicant);
         return mapper.toDto(repository.save(applicant));
     }
 
+    @Transactional
     @Override
     public void delete(Integer applicantId) {
+        if (!repository.existsByApplicantId(applicantId)) {
+            throw new ResourceNotFoundException("Поступающий с id = " + applicantId + " не найден");
+        }
         repository.deleteByApplicantId(applicantId);
     }
 
     @Override
     public void save(ApplicantDTO dto) {
         if (repository.existsByApplicantId(dto.getApplicantId())) {
-            throw new RuntimeException("Applicant with given ID already exists");
+            throw new RuntimeException("Поступающий с таким ID уже существует");
         }
         repository.save(mapper.toEntity(dto));
     }
@@ -84,10 +83,10 @@ public class ApplicantServiceImpl implements ApplicantService {
     @Override
     public void moveToBlacklist(Integer applicantId) {
         Applicant applicant = repository.findByApplicantId(applicantId)
-                .orElseThrow(() -> new RuntimeException("Applicant not found"));
+                .orElseThrow(() -> new RuntimeException("Поступающий не найден"));
 
         if (blacklistRepository.findByApplicantId(applicantId).isPresent()) {
-            throw new RuntimeException("Already in blacklist");
+            throw new RuntimeException("Поступающий уже в черном списке");
         }
 
         BlackList blacklist = blacklistMapper.fromApplicant(applicant);
@@ -99,8 +98,16 @@ public class ApplicantServiceImpl implements ApplicantService {
     @Override
     public void addApplicantWithVerification(ApplicantDTO dto) {
         try {
+            if (dto == null) {
+                throw new IllegalArgumentException("ApplicantDTO не может быть пустым");
+            }
+
             String base64Image = dto.getBase64();
             Integer applicantId = dto.getApplicantId();
+
+            if (base64Image == null || base64Image.isEmpty()) {
+                throw new IllegalArgumentException("Изображение не пришло");
+            }
 
             System.out.println("===> Начало добавления абитуриента. Входной applicant_id: " + applicantId);
 
@@ -135,9 +142,7 @@ public class ApplicantServiceImpl implements ApplicantService {
             });
 
             float[] embeddingArray = externalRecognitionService.getEmbedding(base64Image);
-            String embeddingStr = IntStream.range(0, embeddingArray.length)
-                    .mapToObj(i -> Float.toString(embeddingArray[i]))
-                    .collect(Collectors.joining(","));
+            String embeddingStr = EmbeddingUtils.convertEmbeddingToString(embeddingArray);
             dto.setEmbedding(embeddingStr);
 
             for (Applicant existing : repository.findAll()) {
