@@ -26,8 +26,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +39,7 @@ public class ApplicantServiceImpl implements ApplicantService {
     private final ErrorApplicantServiceImpl errorApplicantService;
 
     private static final String IMAGE_DIR = "/app/images";
+    private static final String IMAGE_DB_DIR = "images";
 
     @Override
     public ApplicantDTO getByApplicantId(Integer applicantId) {
@@ -189,6 +188,8 @@ public class ApplicantServiceImpl implements ApplicantService {
 
             byte[] imageBytes = Base64.getDecoder().decode(base64Image);
             Files.write(Paths.get(filePath), imageBytes);
+
+            filePath = IMAGE_DB_DIR + File.separator + uniqueName;
 
             return filePath;
         } catch (IOException e) {
