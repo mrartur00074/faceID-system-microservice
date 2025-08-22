@@ -53,7 +53,7 @@ FaceID System — это микросервисное приложение дл�
 
 1. **Клонируйте репозиторий:**
    ```bash
-   git clone https://github.com/ваш-юзернейм/faceID-system-microservice.git
+   git clone https://github.com/mrartur00074/faceID-system-microservice.git
    cd faceID-system-microservice
    ```
 
@@ -146,7 +146,7 @@ FaceID System — это микросервисное приложение дл�
 ## 📄 Лицензия
 
 Этот проект распространяется под лицензией MIT.  
-Автор: [@mrartur00074](https://github.com/mrartur00074)
+Автор: [@mrartur0074](https://github.com/mrartur00074)
 
 ---
 
