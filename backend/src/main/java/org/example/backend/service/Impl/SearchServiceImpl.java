@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class SearchServiceImpl implements SearchService {
     private final ApplicantRepository applicantRepository;
     private final BlackListRepository blackListRepository;
-    private final ExternalRecognitionService recognitionService;
+    // private final ExternalRecognitionService recognitionService;
     private final BlackListMapper blackListMapper;
     private final ApplicantMapper applicantMapper;
 
@@ -42,7 +42,8 @@ public class SearchServiceImpl implements SearchService {
 
     private SearchResultDTO searchByImage(String base64Image) {
         try {
-            float[] targetEmbedding = recognitionService.getEmbedding(base64Image);
+            // float[] targetEmbedding = recognitionService.getEmbedding(base64Image);
+            float[] targetEmbedding = {};
             String targetEmbeddingStr = EmbeddingUtils.convertEmbeddingToString(targetEmbedding);
 
             List<ApplicantDTO> applicants = applicantRepository.findAll().stream()

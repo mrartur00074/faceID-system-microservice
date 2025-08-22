@@ -8,3 +8,4 @@ paddlepaddle==2.6.0
 python-multipart==0.0.9
 kafka-python==2.0.2
 aiokafka==0.8.0
+py_eureka_client

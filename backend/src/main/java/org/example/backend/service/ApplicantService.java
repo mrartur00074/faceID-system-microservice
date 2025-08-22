@@ -1,5 +1,6 @@
 package org.example.backend.service;
 import org.example.backend.DTO.ApplicantDTO;
+import org.example.backend.kafka.message.RecognitionMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,6 +11,6 @@ public interface ApplicantService {
     void delete(Integer applicantId);
     void save(ApplicantDTO dto);
     void moveToBlacklist(Integer applicantId);
-    void addApplicantWithVerification(ApplicantDTO dto);
     void deleteAll();
+    RecognitionMessage addTaskForAddApplicant(ApplicantDTO dto);
 }

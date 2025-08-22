@@ -1,16 +1,21 @@
 package org.example.backend.service.Impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.example.backend.DTO.ApplicantDTO;
+import org.example.backend.exception.BusinessException;
+import org.example.backend.kafka.message.RecognitionMessage;
+import org.example.backend.kafka.producer.KafkaProducerService;
 import org.example.backend.mapper.ApplicantMapper;
 import org.example.backend.mapper.BlackListMapper;
 import org.example.backend.model.Applicant;
+import org.example.backend.model.ApplicantTask;
 import org.example.backend.model.BlackList;
 import org.example.backend.repository.ApplicantRepository;
+import org.example.backend.repository.ApplicantTaskRepository;
 import org.example.backend.repository.BlackListRepository;
 import org.example.backend.service.ApplicantService;
-import org.example.backend.util.EmbeddingUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -29,14 +34,14 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ApplicantServiceImpl implements ApplicantService {
-
     private final ApplicantRepository repository;
     private final ApplicantMapper mapper;
     private final BlackListRepository blacklistRepository;
     private final BlackListMapper blacklistMapper;
-    private final ExternalRecognitionServiceImpl externalRecognitionService;
-    private final ErrorApplicantServiceImpl errorApplicantService;
+    private final ApplicantTaskRepository applicantTaskRepository;
+    private final KafkaProducerService kafkaProducerService;
 
     private static final String IMAGE_DIR = "/app/images";
     private static final String IMAGE_DB_DIR = "images";
@@ -72,8 +77,10 @@ public class ApplicantServiceImpl implements ApplicantService {
     }
 
     @Override
+    @Transactional
     public void save(ApplicantDTO dto) {
         if (repository.existsByApplicantId(dto.getApplicantId())) {
+            log.error("Возникла ошибка при сохранении поступающего: " + dto.getApplicantId());
             throw new RuntimeException("Поступающий с таким ID уже существует");
         }
         repository.save(mapper.toEntity(dto));
@@ -95,87 +102,39 @@ public class ApplicantServiceImpl implements ApplicantService {
     }
 
     @Override
-    public void addApplicantWithVerification(ApplicantDTO dto) {
+    public void deleteAll() {
+        repository.deleteAll();
+    }
+
+    @Override
+    @Transactional
+    public RecognitionMessage addTaskForAddApplicant(ApplicantDTO dto) {
         try {
             if (dto == null) {
                 throw new IllegalArgumentException("ApplicantDTO не может быть пустым");
             }
 
             String base64Image = dto.getBase64();
-            Integer applicantId = dto.getApplicantId();
 
             if (base64Image == null || base64Image.isEmpty()) {
                 throw new IllegalArgumentException("Изображение не пришло");
             }
 
-            System.out.println("===> Начало добавления абитуриента. Входной applicant_id: " + applicantId);
-
             String imagePath = saveImageToFile(base64Image);
             dto.setBase64(imagePath);
 
-            Integer applicantIdRec = externalRecognitionService.recognizeApplicantId(base64Image);
+            ApplicantTask task = new ApplicantTask();
+            task.setStatus(ApplicantTask.ApplicationStatus.PENDING);
+            task.setImagePath(imagePath);
+            task.setCreatedAt(LocalDateTime.now());
+            applicantTaskRepository.save(task);
 
-            if (applicantId == null && applicantIdRec == null) {
-                throw new RuntimeException("❌ Не удалось распознать номер с изображения. Данные DTO: " + dto);
-            }
+            kafkaProducerService.sendRecognitionRequest(task.getId());
 
-            if (applicantIdRec != null) {
-                applicantId = applicantIdRec;
-                dto.setApplicantId(applicantId);
-            }
-
-            if (applicantId == null || applicantId <= 0) {
-                throw new RuntimeException("❌ Некорректный applicant_id: " + applicantId + ". DTO: " + dto);
-            }
-
-            final int finalApplicantId = applicantId;
-
-            repository.findByApplicantId(applicantId).ifPresent(existing -> {
-                throw new RuntimeException("❌ Абитуриент с applicant_id " + finalApplicantId + " уже существует. Имя: "
-                        + existing.getName() + " " + existing.getSurname());
-            });
-
-            blacklistRepository.findByApplicantId(applicantId).ifPresent(bl -> {
-                throw new RuntimeException("❌ Абитуриент находится в черном списке: applicant_id = " + finalApplicantId +
-                        ", имя: " + bl.getName() + " " + bl.getSurname());
-            });
-
-            float[] embeddingArray = externalRecognitionService.getEmbedding(base64Image);
-            String embeddingStr = EmbeddingUtils.convertEmbeddingToString(embeddingArray);
-            dto.setEmbedding(embeddingStr);
-
-            for (Applicant existing : repository.findAll()) {
-                if (existing.getEmbedding() != null && EmbeddingUtils.isSimilar(existing.getEmbedding(), dto.getEmbedding())) {
-                    throw new RuntimeException("❌ Найден похожий абитуриент в базе: ID = " + existing.getApplicantId() +
-                            ", имя: " + existing.getName() + " " + existing.getSurname());
-                }
-            }
-
-            for (BlackList bl : blacklistRepository.findAll()) {
-                if (bl.getEmbedding() != null && EmbeddingUtils.isSimilar(bl.getEmbedding(), dto.getEmbedding())) {
-                    throw new RuntimeException("❌ Найден похожий абитуриент в черном списке: ID = " + bl.getApplicantId() +
-                            ", имя: " + bl.getName() + " " + bl.getSurname());
-                }
-            }
-
-            Applicant entity = mapper.toEntity(dto);
-            entity.setCreatedAt(LocalDateTime.now());
-            repository.save(entity);
-
-            System.out.println("✅ Абитуриент успешно добавлен: " + applicantId);
-        } catch (RuntimeException e) {
-            errorApplicantService.save(dto, e.getMessage());
-            throw e;
+            return new RecognitionMessage(task.getId());
         } catch (Exception e) {
-            errorApplicantService.save(dto, e.getMessage());
-            throw new RuntimeException("Непредвиденная ошибка", e);
+            throw new BusinessException("Произошла ошибка при добавлении абитуриента", e);
         }
-
-    }
-
-    @Override
-    public void deleteAll() {
-        repository.deleteAll();
     }
 
     private String saveImageToFile(String base64Image) {

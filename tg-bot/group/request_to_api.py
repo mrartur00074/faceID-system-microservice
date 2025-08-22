@@ -26,7 +26,6 @@ def send_file(base64_data, applicant_id):
 
     print(f"[{response.status_code}] {response_json}")
 
-    # Обработка ответа
     if "error" in response_json:
         message = f"❌ Ошибка: {response_json['error']}"
     elif response_json.get("status") == "success":

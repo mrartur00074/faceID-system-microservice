@@ -10,6 +10,9 @@ public class CorsConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
+        /*
+            Функционал пока отключен, для будущей разработки
+         */
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {

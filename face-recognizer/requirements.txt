@@ -9,3 +9,4 @@ onnxruntime==1.17.1
 pydantic==2.7.1
 kafka-python==2.0.2
 aiokafka==0.8.0
+py_eureka_client

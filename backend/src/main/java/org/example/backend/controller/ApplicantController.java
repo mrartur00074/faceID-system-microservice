@@ -27,8 +27,8 @@ public class ApplicantController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addApplicant(@RequestBody ApplicantDTO dto) {
-        applicantService.addApplicantWithVerification(dto);
-        return ResponseEntity.ok("{\"status\":\"success\",\"message\":\"Абитуриент успешно добавлен\"}");
+        applicantService.addTaskForAddApplicant(dto);
+        return ResponseEntity.ok("{\"status\":\"success\",\"message\":\"Абитуриент добавлен в очередь\"}");
     }
 
     @PutMapping("/{applicantId}")

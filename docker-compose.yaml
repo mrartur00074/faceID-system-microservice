@@ -1,4 +1,23 @@
 services:
+  service-discovery:
+    build:
+      context: ./service-discover
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
   number-reader:
     build:
       context: ./number-reader
@@ -10,6 +29,8 @@ services:
     entrypoint: [ "/wait-for-kafka.sh", "kafka", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002" ]
     networks:
       - app-network
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
 
   face-recognizer:
     build:
@@ -22,6 +43,8 @@ services:
     entrypoint: [ "/wait-for-kafka.sh", "kafka", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001" ]
     networks:
       - app-network
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
 
   tg-bot:
     build:
@@ -39,6 +62,7 @@ services:
       - PASSWORD=${TG_PASSWORD}
       - ADMIN_KEY=${TG_ADMIN_KEY}
       - API_ADDRESS=${BACKEND_API_ADDRESS}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
 
   backend:
     build:
@@ -55,6 +79,7 @@ services:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
     networks:
       - app-network
 

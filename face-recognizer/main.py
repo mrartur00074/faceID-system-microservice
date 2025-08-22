@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from datetime import datetime
 import logging
 import os
+import py_eureka_client.eureka_client as eureka_client
 
 # Настройка логирования
 log_dir = "logs"
@@ -35,21 +36,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Модель запроса
-class ImageRequest(BaseModel):
-    base64_image: str
+EUREKA_SERVER_URL = os.getenv("EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE", "http://localhost:8761/eureka/")
+APP_NAME = os.getenv("APP_NAME", "face-recognizer")
+APP_PORT = int(os.getenv("APP_PORT", 8001))
+APP_HOST = os.getenv("APP_HOST", "face-recognizer")
 
-# POST-эндпоинт для ручного теста
+@app.on_event("startup")
+async def startup_event():
+    await eureka_client.init_async(
+        eureka_server=EUREKA_SERVER_URL,
+        app_name=APP_NAME,
+        instance_port=APP_PORT,
+        instance_host=APP_HOST,
+        instance_ip=APP_HOST,
+        renewal_interval_in_secs=30,
+        duration_in_secs=90
+    )
+
+class ImageRequest(BaseModel):
+    base64: str
+
 @app.post("/get-embedding/")
 def get_embedding(req: ImageRequest):
     logger.info("Запрос получен на /get-embedding/")
-    embedding = extract_embedding(req.base64_image)
+    embedding = extract_embedding(req.base64)
 
     if embedding is None:
         raise HTTPException(status_code=400, detail="Лицо не найдено или изображение некорректно.")
     return {"embedding": embedding}
 
-# Старт Kafka-цикла при запуске приложения
-@app.on_event("startup")
-async def startup_event():
-    start_kafka_loop()
