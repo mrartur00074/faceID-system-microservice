@@ -12,5 +12,4 @@ public interface ApplicantService {
     void save(ApplicantDTO dto);
     void moveToBlacklist(Integer applicantId);
     void deleteAll();
-    RecognitionMessage addTaskForAddApplicant(ApplicantDTO dto);
 }

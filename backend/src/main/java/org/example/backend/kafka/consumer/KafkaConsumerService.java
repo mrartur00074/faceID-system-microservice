@@ -1,10 +1,9 @@
 package org.example.backend.kafka.consumer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.kafka.message.RecognitionMessage;
-import org.example.backend.service.Impl.ApplicantVerificationImpl;
+import org.example.backend.service.Impl.ApplicantVerificationServiceImpl;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class KafkaConsumerService {
-    private final ApplicantVerificationImpl applicantVerificationService;
+    private final ApplicantVerificationServiceImpl applicantVerificationService;
 
     @KafkaListener(
             topics = "${kafka.topics.recognition-requests}",

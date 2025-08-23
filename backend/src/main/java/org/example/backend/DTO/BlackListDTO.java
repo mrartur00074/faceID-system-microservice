@@ -2,8 +2,6 @@ package org.example.backend.DTO;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

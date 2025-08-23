@@ -3,6 +3,7 @@ package org.example.backend.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.DTO.ApplicantDTO;
 import org.example.backend.service.ApplicantService;
+import org.example.backend.service.Impl.ApplicantTaskServiceImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class ApplicantController {
 
     private final ApplicantService applicantService;
+    private final ApplicantTaskServiceImpl applicantTaskService;
 
     @GetMapping("/{applicantId}")
     public ResponseEntity<ApplicantDTO> getByApplicantId(@PathVariable Integer applicantId) {
@@ -27,7 +29,7 @@ public class ApplicantController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addApplicant(@RequestBody ApplicantDTO dto) {
-        applicantService.addTaskForAddApplicant(dto);
+        applicantTaskService.addTaskForAddApplicant(dto);
         return ResponseEntity.ok("{\"status\":\"success\",\"message\":\"Абитуриент добавлен в очередь\"}");
     }
 

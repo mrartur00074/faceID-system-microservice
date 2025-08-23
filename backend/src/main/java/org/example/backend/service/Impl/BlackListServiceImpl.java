@@ -19,7 +19,6 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class BlackListServiceImpl implements BlackListService {
-
     private final BlackListRepository repository;
     private final BlackListMapper mapper;
     private final ApplicantRepository applicantRepository;

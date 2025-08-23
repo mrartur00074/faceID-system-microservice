@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ApplicantVerificationImpl implements ApplicantVerification {
+public class ApplicantVerificationServiceImpl implements ApplicantVerification {
     private final ApplicantTaskRepository applicantTaskRepository;
     private final ApplicantRepository applicantRepository;
     private final NumberReaderServiceImpl numberReaderService;
@@ -34,7 +34,6 @@ public class ApplicantVerificationImpl implements ApplicantVerification {
         ApplicantDTO applicantDTO = new ApplicantDTO();
         ApplicantTask task = applicantTaskRepository.findById(message.getTaskId())
                 .orElseThrow(() -> new RuntimeException("Task not found: " + message.getTaskId()));
-
 
         try {
             task.setStatus(ApplicantTask.ApplicationStatus.NUMBER_RECOGNITION_IN_PROGRESS);

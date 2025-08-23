@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.backend.DTO.SearchRequestDTO;
 import org.example.backend.DTO.SearchResultDTO;
 import org.example.backend.service.Impl.SearchServiceImpl;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -3,8 +3,6 @@ package org.example.backend.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.DTO.ApplicantDTO;
 import org.example.backend.DTO.ErrorApplicantDTO;
-import org.example.backend.model.ErrorApplicant;
-import org.example.backend.repository.ErrorApplicantRepository;
 import org.example.backend.service.ErrorApplicantService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +13,6 @@ import java.util.List;
 @RequestMapping("/api/error-applicants")
 @RequiredArgsConstructor
 public class ErrorApplicantController {
-
-    private final ErrorApplicantRepository errorApplicantRepository;
     private final ErrorApplicantService errorApplicantService;
 
     @GetMapping

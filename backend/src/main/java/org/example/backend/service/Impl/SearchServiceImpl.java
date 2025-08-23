@@ -8,7 +8,6 @@ import org.example.backend.model.Applicant;
 import org.example.backend.model.BlackList;
 import org.example.backend.repository.ApplicantRepository;
 import org.example.backend.repository.BlackListRepository;
-import org.example.backend.service.ExternalRecognitionService;
 import org.example.backend.service.SearchService;
 import org.example.backend.util.EmbeddingUtils;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 public class SearchServiceImpl implements SearchService {
     private final ApplicantRepository applicantRepository;
     private final BlackListRepository blackListRepository;
-    // private final ExternalRecognitionService recognitionService;
     private final BlackListMapper blackListMapper;
     private final ApplicantMapper applicantMapper;
 
@@ -42,7 +40,6 @@ public class SearchServiceImpl implements SearchService {
 
     private SearchResultDTO searchByImage(String base64Image) {
         try {
-            // float[] targetEmbedding = recognitionService.getEmbedding(base64Image);
             float[] targetEmbedding = {};
             String targetEmbeddingStr = EmbeddingUtils.convertEmbeddingToString(targetEmbedding);
 
