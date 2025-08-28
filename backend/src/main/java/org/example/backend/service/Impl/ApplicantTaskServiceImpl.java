@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -53,4 +54,24 @@ public class ApplicantTaskServiceImpl implements ApplicantTaskService {
             throw new BusinessException("Произошла ошибка при добавлении абитуриента", e);
         }
     }
+
+    @Override
+    public void updateStatus(Long taskId, ApplicantTask.ApplicationStatus status) {
+        ApplicantTask task = applicantTaskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found: " + taskId));
+        task.setStatus(status);
+        applicantTaskRepository.save(task);
+    }
+
+    @Override
+    public Optional<ApplicantTask> getApplicantTaskById(Long taskId) {
+        try {
+            ApplicantTask task = applicantTaskRepository.findById(taskId)
+                    .orElseThrow(() -> new RuntimeException("Task not found: " + taskId));
+            return Optional.of(task);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
 }

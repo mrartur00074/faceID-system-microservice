@@ -12,7 +12,7 @@ public class EmbeddingUtils {
         return cosineSimilarity(arr1, arr2) > SIMILARITY_THRESHOLD;
     }
 
-    private static float[] parseEmbeddingString(String embStr) {
+    public static float[] parseEmbeddingString(String embStr) {
         String[] parts = embStr.split(",");
         float[] result = new float[parts.length];
         for (int i = 0; i < parts.length; i++) {
@@ -21,7 +21,7 @@ public class EmbeddingUtils {
         return result;
     }
 
-    private static double cosineSimilarity(float[] v1, float[] v2) {
+    public static double cosineSimilarity(float[] v1, float[] v2) {
         double dot = 0.0, normV1 = 0.0, normV2 = 0.0;
         for (int i = 0; i < v1.length; i++) {
             dot += v1[i] * v2[i];
