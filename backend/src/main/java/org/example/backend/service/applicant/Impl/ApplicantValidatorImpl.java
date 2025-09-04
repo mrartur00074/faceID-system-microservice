@@ -1,9 +1,9 @@
-package org.example.backend.service.Impl;
+package org.example.backend.service.applicant.Impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.backend.repository.ApplicantRepository;
 import org.example.backend.repository.BlackListRepository;
-import org.example.backend.service.ApplicantValidator;
+import org.example.backend.service.applicant.ApplicantValidator;
 import org.springframework.stereotype.Service;
 
 @Service

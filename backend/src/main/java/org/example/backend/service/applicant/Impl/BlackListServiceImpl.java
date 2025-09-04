@@ -1,4 +1,4 @@
-package org.example.backend.service.Impl;
+package org.example.backend.service.applicant.Impl;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.example.backend.DTO.BlackListDTO;
 import org.example.backend.mapper.ApplicantMapper;
@@ -7,8 +7,8 @@ import org.example.backend.model.BlackList;
 import org.example.backend.mapper.BlackListMapper;
 import org.example.backend.repository.ApplicantRepository;
 import org.example.backend.repository.BlackListRepository;
-import org.example.backend.service.BlackListService;
 import lombok.RequiredArgsConstructor;
+import org.example.backend.service.applicant.BlackListService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

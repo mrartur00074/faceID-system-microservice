@@ -2,8 +2,8 @@ package org.example.backend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.backend.DTO.ApplicantDTO;
-import org.example.backend.service.ApplicantService;
-import org.example.backend.service.Impl.ApplicantTaskServiceImpl;
+import org.example.backend.service.applicant.ApplicantService;
+import org.example.backend.service.applicant.Impl.ApplicantTaskServiceImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Page;

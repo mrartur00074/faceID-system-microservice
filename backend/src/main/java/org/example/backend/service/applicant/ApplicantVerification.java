@@ -1,4 +1,4 @@
-package org.example.backend.service;
+package org.example.backend.service.applicant;
 
 import org.example.backend.kafka.message.RecognitionMessage;
 

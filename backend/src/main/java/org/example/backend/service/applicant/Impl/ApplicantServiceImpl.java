@@ -1,6 +1,5 @@
-package org.example.backend.service.Impl;
+package org.example.backend.service.applicant.Impl;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
@@ -11,8 +10,7 @@ import org.example.backend.model.Applicant;
 import org.example.backend.model.BlackList;
 import org.example.backend.repository.ApplicantRepository;
 import org.example.backend.repository.BlackListRepository;
-import org.example.backend.service.ApplicantService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.backend.service.applicant.ApplicantService;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;

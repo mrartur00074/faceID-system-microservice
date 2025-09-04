@@ -1,4 +1,4 @@
-package org.example.backend.service.Impl;
+package org.example.backend.service.applicant.Impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,7 @@ import org.example.backend.kafka.message.RecognitionMessage;
 import org.example.backend.kafka.producer.KafkaProducerService;
 import org.example.backend.model.ApplicantTask;
 import org.example.backend.repository.ApplicantTaskRepository;
-import org.example.backend.service.ApplicantTaskService;
+import org.example.backend.service.applicant.ApplicantTaskService;
 import org.example.backend.util.ImageConvertor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

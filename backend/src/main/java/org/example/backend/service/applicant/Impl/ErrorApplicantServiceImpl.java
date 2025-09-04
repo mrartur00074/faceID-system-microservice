@@ -1,4 +1,4 @@
-package org.example.backend.service.Impl;
+package org.example.backend.service.applicant.Impl;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.example.backend.model.Applicant;
 import org.example.backend.model.ErrorApplicant;
 import org.example.backend.repository.ApplicantRepository;
 import org.example.backend.repository.ErrorApplicantRepository;
-import org.example.backend.service.ErrorApplicantService;
+import org.example.backend.service.applicant.ErrorApplicantService;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

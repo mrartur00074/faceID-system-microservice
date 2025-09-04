@@ -6,7 +6,7 @@ import org.example.backend.mapper.BlackListMapper;
 import org.example.backend.model.Applicant;
 import org.example.backend.repository.ApplicantRepository;
 import org.example.backend.repository.BlackListRepository;
-import org.example.backend.service.Impl.ApplicantServiceImpl;
+import org.example.backend.service.applicant.Impl.ApplicantServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package org.example.backend.service;
+package org.example.backend.service.applicant;
 
 public interface ApplicantValidator {
     void validateApplicantId(Integer applicantId);

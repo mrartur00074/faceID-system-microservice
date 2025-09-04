@@ -1,6 +1,5 @@
-package org.example.backend.service;
+package org.example.backend.service.applicant;
 import org.example.backend.DTO.ApplicantDTO;
-import org.example.backend.kafka.message.RecognitionMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

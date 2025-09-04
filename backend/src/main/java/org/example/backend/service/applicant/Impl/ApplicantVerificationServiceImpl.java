@@ -1,12 +1,15 @@
-package org.example.backend.service.Impl;
+package org.example.backend.service.applicant.Impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.DTO.ApplicantDTO;
 import org.example.backend.kafka.message.RecognitionMessage;
 import org.example.backend.model.ApplicantTask;
-import org.example.backend.service.ApplicantVerification;
-import org.example.backend.service.ErrorApplicantService;
+import org.example.backend.service.Impl.DuplicateFinderServiceImpl;
+import org.example.backend.service.Impl.FaceRecognitionServiceImpl;
+import org.example.backend.service.Impl.NumberReaderServiceImpl;
+import org.example.backend.service.applicant.ApplicantVerification;
+import org.example.backend.service.applicant.ErrorApplicantService;
 import org.example.backend.util.EmbeddingUtils;
 import org.example.backend.util.ImageConvertor;
 import org.springframework.stereotype.Service;

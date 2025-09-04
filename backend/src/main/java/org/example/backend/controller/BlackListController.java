@@ -1,6 +1,6 @@
 package org.example.backend.controller;
 import org.example.backend.DTO.BlackListDTO;
-import org.example.backend.service.BlackListService;
+import org.example.backend.service.applicant.BlackListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

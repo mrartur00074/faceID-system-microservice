@@ -3,7 +3,7 @@ package org.example.backend.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.DTO.ApplicantDTO;
 import org.example.backend.DTO.ErrorApplicantDTO;
-import org.example.backend.service.ErrorApplicantService;
+import org.example.backend.service.applicant.ErrorApplicantService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
