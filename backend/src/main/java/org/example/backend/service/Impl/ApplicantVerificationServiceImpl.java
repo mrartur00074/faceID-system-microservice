@@ -38,6 +38,9 @@ public class ApplicantVerificationServiceImpl implements ApplicantVerification {
             Integer recognizedNumber = numberReaderService.recognizerNumber(base64)
                     .orElseThrow(() -> new RuntimeException("Number not recognized: " + task.getId()));
 
+            if (recognizedNumber < 0)
+                throw new RuntimeException("Данное число уже есть в кэше абитуриентов: " + recognizedNumber);
+
             applicantValidator.validateApplicantId(recognizedNumber);
 
             applicantTaskService.updateStatus(task.getId(), ApplicantTask.ApplicationStatus.FACE_RECOGNITION_IN_PROGRESS);

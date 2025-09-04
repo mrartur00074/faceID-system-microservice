@@ -6,6 +6,8 @@ import org.example.backend.DTO.request.NumberReaderRequest;
 import org.example.backend.DTO.response.NumberReaderResponse;
 import org.example.backend.feign.NumberReaderFeignClient;
 import org.example.backend.service.NumberReaderService;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.util.Optional;
 @Slf4j
 public class NumberReaderServiceImpl implements NumberReaderService {
     private final NumberReaderFeignClient numberReaderFeignClient;
+    private final CacheManager cacheManager;
 
     @Override
     public Optional<Integer> recognizerNumber(String base64) {
@@ -29,6 +32,11 @@ public class NumberReaderServiceImpl implements NumberReaderService {
 
                 if (body.getNumber() != null) {
                     Integer number = body.getNumber();
+                    Cache applicantsCache = cacheManager.getCache("applicants");
+                    if (applicantsCache != null && applicantsCache.get(number) != null) {
+                        log.warn("Распознанный ID {} уже есть в кэше абитуриентов", number);
+                        return Optional.of(number * -1);
+                    }
                     return Optional.of(number);
                 } else {
                     log.warn("Number reader service returned empty or null recognized number");

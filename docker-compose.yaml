@@ -75,11 +75,14 @@ services:
     depends_on:
       - db
       - kafka
+      - redis
     env_file:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: docker
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
     networks:
       - app-network
 
@@ -139,9 +142,23 @@ services:
       - VITE_BASE_URL=${VITE_BASE_URL}
       - VITE_BACKEND_URL=${VITE_BACKEND_URL}
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    volumes:
+      - redis_data:/data
+    command: >
+      redis-server 
+      --appendonly yes 
+
 volumes:
   pgdata:
   student_images:
+  redis_data:
 
 networks:
   app-network:
